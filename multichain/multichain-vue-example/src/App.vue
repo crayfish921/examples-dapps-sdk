@@ -304,6 +304,7 @@
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
+import { BitcoinXdefiProvider, BinanceXdefiProvider, CommonMethodsProvider } from 'xdefi-sdk'
 
 export default {
   name: "App",
@@ -313,6 +314,11 @@ export default {
   mounted() {
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
+        const tst = new BitcoinXdefiProvider();
+        const tst2 = new BinanceXdefiProvider();
+        const tst3 = new CommonMethodsProvider(); // xfi is missing -> error
+        console.log(tst, tst2, tst3);
+        tst3.requestAccounts('binance', (result, error) => console.log(result, error))
         if ("xfi" in window) {
           // Detecting the XDeFi providers: xfi and ethereum
           console.log(window.xfi, window.ethereum);
@@ -466,25 +472,11 @@ export default {
     },
     submitBinance() {
       console.debug("submitBinance", this.binanceInput, this.selectedChain);
+      const binanceProvider = new BinanceXdefiProvider();
       const { from, to, asset, amount, memo } = this.binanceInput;
-      this.xfiObject[this.selectedChain.chain].request(
-        {
-          method: "transfer",
-          params: [
-            {
-              asset,
-              from,
-              recipient: to,
-              amount,
-              memo,
-            },
-          ],
-        },
-        (error, result) => {
-          console.debug(error, result);
-          this.lastResult = { error, result };
-        }
-      );
+      console.log(from, to, asset, amount, memo);
+      // const fn = (res) => res;
+      binanceProvider.transfer([{from, asset, amount, memo, recipient: to, callbackFunction: (e, res) => console.log(e ,res)}]);
     },
     submitThorBased() {
       console.debug("submitThorBased", this.thorbasedInput, this.selectedChain);
